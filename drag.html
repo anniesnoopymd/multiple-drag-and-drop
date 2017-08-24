@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Multiple drag and drop</title>
+	<link rel="stylesheet" href="drag.css">
+</head>
+<body>
+	
+	<div id="maincontainer">
+	    <div id="navtoplistline">&nbsp;</div>
+	    <div id="contentwrapper">
+	        <div id="maincolumn">
+	            <div class="text">
+	                <div class="listBlock">
+	                     <h2>Available</h2>
+
+	                    <ul id="sortable1" class='droptrue'>
+	                        <li id="article_1">Article #1</li>
+	                        <li id="article_2">Article #2</li>
+	                        <li id="article_3">Article #3</li>
+	                        <li id="article_4">Article #4</li>
+	                        <li id="article_5">Article #5</li>
+	                    </ul>
+	                </div>
+	                <div class="listBlock">
+	                     <h2>First Articles</h2>
+
+	                    <ul id="sortable2" class='droptrue'></ul>
+	                </div>
+	               <div class="listBlock">
+	                     <h2>Second Articles</h2>
+
+	                    <ul id="sortable3" class='droptrue'></ul>
+	                </div>
+	                <br clear="both" />
+	                <br>
+	                <p>Which articles were selected to 'First Articles'?
+	                    <br />
+	                    <input type="text" id="postOrder" name="postOrder" value="" size="30" />
+	                </p>
+	               <p>Which articles were selected to 'Second Articles'?
+	                    <br />
+	                    <input type="text" id="add" name="add" value="" size="30" />
+	                </p>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+	<script>
+		$(function () {
+		    $('.droptrue').on('click', 'li', function () {
+		        $(this).toggleClass('selected');
+		    });
+
+		    $("ul.droptrue").sortable({
+		        connectWith: 'ul.droptrue',
+		        opacity: 0.6,
+		        revert: true,
+		        helper: function (e, item) {
+		            console.log('parent-helper');
+		            console.log(item);
+		            if(!item.hasClass('selected'))
+		               item.addClass('selected');
+		            var elements = $('.selected').not('.ui-sortable-placeholder').clone();
+		            var helper = $('<ul/>');
+		            item.siblings('.selected').addClass('hidden');
+		            return helper.append(elements);
+		        },
+		        start: function (e, ui) {
+		            var elements = ui.item.siblings('.selected.hidden').not('.ui-sortable-placeholder');
+		            ui.item.data('items', elements);
+		        },
+		        receive: function (e, ui) {
+		            ui.item.before(ui.item.data('items'));
+		        },
+		        stop: function (e, ui) {
+		            ui.item.siblings('.selected').removeClass('hidden');
+		            $('.selected').removeClass('selected');
+		        },
+		        update: function(){
+		            updatePostOrder();
+		            updateAdd();
+		        }
+		    });
+		   
+
+		    $("#sortable1, #sortable2, #sortable3").disableSelection();
+		    $("#sortable1, #sortable2, #sortable3").css('minHeight', $("#sortable1, #sortable2").height() + "px");
+		});
+
+
+		function updatePostOrder() {
+		    var arr = [];
+		    $("#sortable2 li").each(function () {
+		        arr.push($(this).attr('id'));
+		    });
+		    $('#postOrder').val(arr.join(','));
+		}
+
+
+		function updateAdd() {
+		    var arr = [];
+		    $("#sortable3 li").each(function () {
+		        arr.push($(this).attr('id'));
+		    });
+		    $('#add').val(arr.join(','));
+		}
+
+	</script>
+</body>
+</html>
